@@ -3,10 +3,18 @@
 import { useState, useEffect } from "react";
 import { Upload, FileText, ArrowLeft, Download, Type, Image as ImageIcon, PenTool, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
 import Link from "next/link";
-import { Document, Page, pdfjs } from 'react-pdf';
+import dynamic from 'next/dynamic';
 
-// Configure PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Dynamically import react-pdf components to avoid SSR issues
+const Document = dynamic(() => import('react-pdf').then(mod => mod.Document), { ssr: false });
+const Page = dynamic(() => import('react-pdf').then(mod => mod.Page), { ssr: false });
+
+// Configure PDF.js worker only on client side
+if (typeof window !== 'undefined') {
+    import('react-pdf').then((pdfjs) => {
+        pdfjs.pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.pdfjs.version}/build/pdf.worker.min.mjs`;
+    });
+}
 
 export default function PdfEditor() {
     const [file, setFile] = useState<File | null>(null);
