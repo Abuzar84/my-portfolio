@@ -1,5 +1,7 @@
-import { Github, Linkedin, Twitter, Mail, Code2, Database, Smartphone, Layout, Terminal, Server } from 'lucide-react';
+import { Mail, Code2, Database, Smartphone, Layout, Terminal } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { GithubIcon, LinkedinIcon, FacebookIcon, XIcon, InstagramIcon, PdfIcon } from '@/components/social-icons';
+import Link from 'next/link';
 
 export default function Home() {
   const skills = [
@@ -10,7 +12,7 @@ export default function Home() {
     { name: "Kotlin", icon: <Smartphone className="w-6 h-6" />, category: "Mobile" },
     { name: "Android Dev", icon: <Smartphone className="w-6 h-6" />, category: "Mobile" },
     { name: "Python", icon: <Terminal className="w-6 h-6" />, category: "Language" },
-    { name: "Github", icon: <Server className="w-6 h-6" />, category: "Tool" },
+    { name: "Github", icon: <GithubIcon className="w-6 h-6" />, category: "Tool" },
   ];
 
   return (
@@ -43,8 +45,8 @@ export default function Home() {
             <a href="#contact" className="px-8 py-3 rounded-full bg-black dark:bg-white text-white dark:text-black font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors">
               Get in touch
             </a>
-            <a href="#skills" className="px-8 py-3 rounded-full border border-black/20 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/10 transition-colors backdrop-blur-sm">
-              View Skills
+            <a href="#projects" className="px-8 py-3 rounded-full border border-black/20 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/10 transition-colors backdrop-blur-sm">
+              View Work
             </a>
           </div>
         </div>
@@ -87,6 +89,43 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Projects Section */}
+      <section id="projects" className="py-24 px-4 bg-white dark:bg-black transition-colors duration-300">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-16 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+              Featured Projects
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">Showcasing my latest work and technical endeavors</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="group relative rounded-2xl overflow-hidden border border-black/5 dark:border-white/10 bg-gray-50 dark:bg-white/5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              < Link href="/pdf-editor" className="absolute inset-0 z-10">
+                <span className="sr-only">View PDF Editor Project</span>
+              </Link>
+              <div className="aspect-video bg-indigo-100 dark:bg-indigo-900/20 flex items-center justify-center">
+                <PdfIcon className="w-16 h-16 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <div className="p-6 space-y-4">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">PDF Editor</h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                  A comprehensive tool for editing and managing PDF documents. Features include merging, splitting, and text manipulation.
+                </p>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <span className="px-3 py-1 text-xs rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300">
+                    Next.js
+                  </span>
+                  <span className="px-3 py-1 text-xs rounded-full bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300">
+                    TypeScript
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer / Contact */}
       <footer id="contact" className="py-20 px-4 border-t border-black/5 dark:border-white/10 bg-white dark:bg-black transition-colors duration-300">
         <div className="max-w-4xl mx-auto text-center space-y-12">
@@ -99,10 +138,12 @@ export default function Home() {
 
           <div className="flex justify-center gap-6">
             {[
-              { icon: <Github />, href: "#", label: "GitHub" },
-              { icon: <Twitter />, href: "#", label: "Twitter" },
-              { icon: <Linkedin />, href: "#", label: "LinkedIn" },
-              { icon: <Mail />, href: "mailto:hello@example.com", label: "Email" },
+              { icon: <GithubIcon className="w-6 h-6" />, href: "https://github.com/Abuzar84", label: "GitHub" },
+              { icon: <FacebookIcon className="w-6 h-6" />, href: "https://www.facebook.com/sayyed.abuzar.941349/", label: "Facebook" },
+              { icon: <InstagramIcon className="w-6 h-6" />, href: "https://www.instagram.com/sayyedabuzar844/", label: "Instagram" },
+              { icon: <XIcon className="w-6 h-6" />, href: "https://x.com/SayyedAbuz46392", label: "X" },
+              { icon: <LinkedinIcon className="w-6 h-6" />, href: "https://www.linkedin.com/in/sayyed-abuzar-6ba990279/", label: "LinkedIn" },
+              { icon: <Mail className="w-6 h-6" />, href: "mailto:sayyedabuzar021@gmail.com", label: "Email" },
             ].map((social, idx) => (
               <a
                 key={idx}
