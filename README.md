@@ -31,6 +31,8 @@ This is the personal portfolio website for **Abuzar Wahadatullah Sayyed**, a Ful
 │   │   └── page.tsx         # Admin analytics dashboard with Supabase auth
 │   ├── pdf-editor/
 │   │   └── page.tsx         # PDF editor page
+│   ├── privacy-policy/
+│   │   └── page.tsx         # Privacy policy page
 │   ├── globals.css          # Global styles, Tailwind setup, and custom animations
 │   ├── layout.tsx           # Root layout including ThemeProvider
 │   └── page.tsx             # Main landing page (Hero, Skills, Footer)
