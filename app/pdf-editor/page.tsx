@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Upload, FileText, ArrowLeft, Download, Type, Image as ImageIcon, PenTool, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
 import Link from "next/link";
 import dynamic from 'next/dynamic';
+import { AnalyticsTracker } from '@/components/analytics-tracker';
 
 // Dynamically import react-pdf components to avoid SSR issues
 const Document = dynamic(() => import('react-pdf').then(mod => mod.Document), { ssr: false });
@@ -182,6 +183,7 @@ export default function PdfEditor() {
 
     return (
         <div className="min-h-screen flex flex-col bg-white dark:bg-black text-gray-900 dark:text-gray-100 transition-colors duration-300">
+            <AnalyticsTracker page="/pdf-editor" />
             <nav className="p-6">
                 <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors">
                     <ArrowLeft className="w-5 h-5" />

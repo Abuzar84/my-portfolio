@@ -1,6 +1,7 @@
 import { Mail, Code2, Database, Smartphone, Layout, Terminal } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { GithubIcon, LinkedinIcon, FacebookIcon, XIcon, InstagramIcon, PdfIcon } from '@/components/social-icons';
+import { AnalyticsTracker } from '@/components/analytics-tracker';
 import Link from 'next/link';
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-100 transition-colors duration-300">
+      <AnalyticsTracker page="/" />
       <div className="absolute top-4 right-4 z-50">
         <ThemeToggle />
       </div>
@@ -158,8 +160,11 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="pt-8 text-sm text-gray-600 dark:text-gray-600">
-            © {new Date().getFullYear()} Abuzar Wahadatullah Sayyed. All rights reserved.
+          <div className="pt-8 text-sm text-gray-600 dark:text-gray-600 flex flex-col md:flex-row items-center justify-between gap-4">
+            <span>© {new Date().getFullYear()} Abuzar Wahadatullah Sayyed. All rights reserved.</span>
+            <Link href="/privacy-policy" className="hover:text-black dark:hover:text-white transition-colors underline underline-offset-4">
+              Privacy Policy
+            </Link>
           </div>
         </div>
       </footer>
