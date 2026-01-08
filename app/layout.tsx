@@ -15,8 +15,27 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Abuzar Wahadatullah Sayyed | Full Stack Developer",
-  description: "Portfolio of Abuzar Wahadatullah Sayyed - Full Stack Developer specializing in Next.js, Android, and Python.",
+  metadataBase: new URL('https://abuzarsayyed.vercel.app'),
+  title: "Abuzar Wahadatullah Sayyed | Full Stack Developer & PDF Tools",
+  description: "Explore the portfolio of Abuzar Wahadatullah Sayyed. Featuring full-stack web applications, native mobile apps, and high-performance PDF editing tools.",
+  keywords: ["Full Stack Developer", "Next.js Portfolio", "Android Developer", "PDF Editor Online", "Abuzar Sayyed", "Software Engineer"],
+  authors: [{ name: "Abuzar Wahadatullah Sayyed" }],
+  openGraph: {
+    title: "Abuzar Wahadatullah Sayyed Portfolio",
+    description: "Full Stack Developer Portfolio & Free Online PDF Tools",
+    url: "https://abuzarsayyed.vercel.app",
+    siteName: "Abuzar Sayyed Portfolio",
+    images: [
+      {
+        url: "/pdf-editor-preview.png",
+        width: 1200,
+        height: 630,
+        alt: "Abuzar Sayyed Portfolio Preview",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
