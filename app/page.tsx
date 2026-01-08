@@ -106,8 +106,12 @@ export default function Home() {
               < Link href="/pdf-editor" className="absolute inset-0 z-10">
                 <span className="sr-only">View PDF Editor Project</span>
               </Link>
-              <div className="aspect-video bg-indigo-100 dark:bg-indigo-900/20 flex items-center justify-center">
-                <PdfIcon className="w-16 h-16 text-indigo-600 dark:text-indigo-400" />
+              <div className="aspect-video bg-indigo-100 dark:bg-indigo-900/20 flex items-center justify-center overflow-hidden">
+                <img
+                  src="/pdf-editor-preview.png"
+                  alt="PDF Editor Preview"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
               </div>
               <div className="p-6 space-y-4">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">PDF Editor</h3>

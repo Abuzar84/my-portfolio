@@ -11,7 +11,12 @@ This is the personal portfolio website for **Abuzar Wahadatullah Sayyed**, a Ful
 -   **SEO Optimized**: Proper metadata and structure for search engine visibility.
 -   **Admin Analytics Dashboard**: Track page views, visitor analytics, and referrer data with beautiful visualizations.
 -   **Supabase Authentication**: Secure email/password login for admin access.
--   **PDF Editor**: Integrated PDF viewing and editing capabilities.
+-   **PDF Editor**: Integrated PDF viewing and editing capabilities, allowing users to add text, resize elements, and download modified documents.
+-   **Secure File Handling**: Client-side processing ensures PDF files are never uploaded to a server for privacy.
+
+## 📸 Project Previews
+
+![PDF Editor Preview](public/pdf-editor-preview.png)
 
 ## 🛠️ Technologies Used
 
