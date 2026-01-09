@@ -86,19 +86,25 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
                 const pageIndex = el.page - 1
                 if (pageIndex >= 0 && pageIndex < pages.length) {
                     const page = pages[pageIndex]
-                    const { height } = page.getSize()
+                    const { width, height } = page.getSize()
+
+                    // PDF pages can have a CropBox origin that isn't (0,0)
+                    // We must account for this offset
+                    const cropBox = page.getCropBox()
+                    const offsetX = cropBox.x || 0
+                    const offsetY = cropBox.y || 0
 
                     // PDF coordinates start from bottom-left
-                    // Html is top-left
-                    // We need to account for font height. 
-                    // pdf-lib drawText y is the baseline. 
-                    // Approximation: y - fontSize works well for top-alignment if we subtract a bit more or less.
-                    // Let's try height - y - fontSize roughly.
-
-                    const pdfY = height - el.y - (el.fontSize * 0.8)
+                    // HTML is top-left. 
+                    // Visible Top of page in PDF = offsetY + height
+                    // We subtract el.y to get the top of our text box in PDF space.
+                    // pdf-lib's drawText y is the baseline. 
+                    // We subtract roughly 0.9 * fontSize to account for the top-gap in the HTML line-box and the ascent.
+                    const pdfY = (height + offsetY) - el.y - (el.fontSize * 0.9)
+                    const pdfX = el.x + offsetX
 
                     page.drawText(el.text, {
-                        x: el.x,
+                        x: pdfX,
                         y: pdfY,
                         size: el.fontSize,
                         font: font,

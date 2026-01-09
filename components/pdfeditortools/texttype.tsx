@@ -139,18 +139,19 @@ export default function TextType({ id, initialText = "New Text", fontSize = 16, 
             onMouseDown={handleMouseDown}
             className="group absolute"
         >
-            <div className="relative group-hover:ring-1 group-hover:ring-blue-300 rounded p-1 transition-shadow duration-200 h-full">
+            <div className="relative group-hover:ring-1 group-hover:ring-blue-300 rounded transition-shadow duration-200 h-full">
                 <textarea
                     value={text}
                     onChange={handleTextChange}
-                    className="bg-transparent border-none outline-none text-black font-sans w-full h-full p-0 m-0 resize-none overflow-hidden"
+                    className="bg-transparent border-none outline-none text-black font-sans w-full h-full p-0 m-0 resize-none overflow-hidden cursor-text"
                     style={{
-                        fontSize: `${fontSize}px`,
+                        fontSize: `${fontSize * scale}px`,
                         lineHeight: '1.2',
-                        minHeight: `${height * scale}px`, // Start with init height
-                        height: '100%' // Allow it to fill container if container resized? 
-                        // Actually `textarea` auto-height is tricky without ref manual adjustment.
-                        // Simpler: let container decide size.
+                        minHeight: `${height * scale}px`,
+                        height: '100%',
+                        padding: 0,
+                        margin: 0,
+                        border: 'none',
                     }}
                     ref={(el) => {
                         if (el) {
@@ -176,7 +177,7 @@ export default function TextType({ id, initialText = "New Text", fontSize = 16, 
                 {/* Box Width Resize Handle (Right Bar) */}
                 <div
                     onMouseDown={handleBoxResizeMouseDown}
-                    className="absolute top-0 right-0 w-1.5 h-full cursor-ew-resize opacity-0 group-hover:opacity-50 hover:!opacity-100 bg-blue-300 transition-opacity z-40 rounded-r"
+                    className="absolute top-0 right-0 w-1 h-full cursor-ew-resize opacity-0 group-hover:opacity-50 hover:!opacity-100 bg-blue-400 transition-opacity z-40 rounded-r"
                     title="Drag to resize width"
                 />
 

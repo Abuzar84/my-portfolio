@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Script from 'next/script'
 
 import { ThemeProvider } from "@/components/theme-provider";
 
@@ -54,6 +55,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <Script
+            src="https://3nbf4.com/act/files/tag.min.js?z=10435650"
+            data-cfasync="false"
+            strategy="beforeInteractive"
+          />
           {children}
         </ThemeProvider>
       </body>
