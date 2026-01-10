@@ -59,11 +59,9 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
-        <Script
-          src="https://3nbf4.com/act/files/tag.min.js?z=10435650"
-          data-cfasync="false"
-          strategy="beforeInteractive"
-        />
+        <Script id="al5sm-tag">
+          {`(function(s){s.dataset.zone='10444619',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
+        </Script>
       </body>
     </html>
   );
