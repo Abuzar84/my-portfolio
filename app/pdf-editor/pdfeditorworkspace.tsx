@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { Pen } from 'lucide-react'
 import { Document, Page, pdfjs } from 'react-pdf'
 import 'react-pdf/dist/Page/AnnotationLayer.css'
 import 'react-pdf/dist/Page/TextLayer.css'
 import TextType from '@/components/pdfeditortools/texttype'
+import SimplePenTool from '@/components/pdfeditortools/pentool'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 
 // Configure worker safely
@@ -26,18 +28,50 @@ interface TextElement {
     height: number
 }
 
+interface DrawingPath {
+    id: number
+    page: number
+    d: string // SVG path data
+    color: string
+    strokeWidth: number
+}
+
 export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceProps) {
     const [numPages, setNumPages] = useState<number | null>(null)
     const [pageNumber, setPageNumber] = useState<number>(1)
     const [scale, setScale] = useState<number>(1.0)
     const [textElements, setTextElements] = useState<TextElement[]>([])
+    const [paths, setPaths] = useState<DrawingPath[]>([])
+    const [activeTool, setActiveTool] = useState<'text' | 'pen'>('text')
+    const [strokeColor, setStrokeColor] = useState('#ff0000')
+    const [strokeWidth, setStrokeWidth] = useState(3)
     const [isDownloading, setIsDownloading] = useState(false)
+    const [renderedPageSize, setRenderedPageSize] = useState<{ [key: number]: { width: number, height: number, originalWidth: number, originalHeight: number, rotation: number } }>({})
 
     function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
         setNumPages(numPages)
     }
 
+    const onPageLoadSuccess = (page: any) => {
+        // viewport.width/height is the actual rendered size in pixels at scale=1
+        // page.width/height is the original PDF point size
+        const { width, height, rotation } = page;
+        const viewport = page.getViewport({ scale: 1 });
+
+        setRenderedPageSize(prev => ({
+            ...prev,
+            [page.pageNumber]: {
+                width: viewport.width,
+                height: viewport.height,
+                originalWidth: width,
+                originalHeight: height,
+                rotation: rotation
+            }
+        }));
+    };
+
     const addText = () => {
+        setActiveTool('text')
         const newId = Math.max(0, ...textElements.map(e => e.id)) + 1
         setTextElements([...textElements, {
             id: newId,
@@ -48,6 +82,17 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
             fontSize: 16,
             width: 200,
             height: 50
+        }])
+    }
+
+    const handlePathComplete = (pathData: string) => {
+        const newId = Math.max(0, ...paths.map(p => p.id)) + 1
+        setPaths([...paths, {
+            id: newId,
+            page: pageNumber,
+            d: pathData,
+            color: strokeColor,
+            strokeWidth: strokeWidth
         }])
     }
 
@@ -82,26 +127,68 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
             const pages = pdfDoc.getPages()
             const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
 
+            // Draw paths using native pdf-lib operators
+            paths.forEach(p => {
+                const pageIndex = p.page - 1
+                if (pageIndex >= 0 && pageIndex < pages.length) {
+                    const page = pages[pageIndex]
+                    const pageInfo = renderedPageSize[p.page]
+                    if (!pageInfo) return;
+
+                    const { width, height } = page.getSize()
+
+                    // Parse the SVG path "M x y L x y..." back into points
+                    const points = p.d.split(/[ML]/).filter(s => s.trim() !== '').map(pair => {
+                        const [x, y] = pair.trim().split(/\s+/).map(parseFloat)
+                        return { x, y }
+                    })
+
+                    if (points.length < 2) return
+
+                    const scaleX = width / pageInfo.width
+                    const scaleY = height / pageInfo.height
+
+                    // Set stroke properties
+                    const r = parseInt(p.color.slice(1, 3), 16) / 255
+                    const g = parseInt(p.color.slice(3, 5), 16) / 255
+                    const b = parseInt(p.color.slice(5, 7), 16) / 255
+
+                    // Draw each segment of the path using native pdf-lib drawLine
+                    for (let i = 0; i < points.length - 1; i++) {
+                        const startX = points[i].x * scaleX
+                        const startY = height - (points[i].y * scaleY)
+                        const endX = points[i + 1].x * scaleX
+                        const endY = height - (points[i + 1].y * scaleY)
+
+                        page.drawLine({
+                            start: { x: startX, y: startY },
+                            end: { x: endX, y: endY },
+                            thickness: p.strokeWidth * scaleX,
+                            color: rgb(r, g, b),
+                            opacity: 1,
+                        })
+                    }
+                }
+            })
+
             textElements.forEach(el => {
                 const pageIndex = el.page - 1
                 if (pageIndex >= 0 && pageIndex < pages.length) {
                     const page = pages[pageIndex]
-                    const { width, height } = page.getSize()
+                    const pageInfo = renderedPageSize[el.page]
+                    if (!pageInfo) return;
 
-                    // PDF pages can have a CropBox origin that isn't (0,0)
-                    // We must account for this offset
+                    const { width, height } = page.getSize()
                     const cropBox = page.getCropBox()
                     const offsetX = cropBox.x || 0
                     const offsetY = cropBox.y || 0
 
-                    // PDF coordinates start from bottom-left
-                    // HTML is top-left. 
-                    // Visible Top of page in PDF = offsetY + height
-                    // We subtract el.y to get the top of our text box in PDF space.
-                    // pdf-lib's drawText y is the baseline. 
-                    // We subtract roughly 0.9 * fontSize to account for the top-gap in the HTML line-box and the ascent.
-                    const pdfY = (height + offsetY) - el.y - (el.fontSize * 0.9)
-                    const pdfX = el.x + offsetX
+                    // Calculate mapping from browser pixels (at scale 1) to PDF points
+                    const scaleX = width / pageInfo.width
+                    const scaleY = height / pageInfo.height
+
+                    const pdfX = (el.x * scaleX) + offsetX
+                    const pdfY = (height + offsetY) - (el.y * scaleY) - (el.fontSize * 0.8)
 
                     page.drawText(el.text, {
                         x: pdfX,
@@ -109,7 +196,7 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
                         size: el.fontSize,
                         font: font,
                         color: rgb(0, 0, 0),
-                        maxWidth: el.width,
+                        maxWidth: el.width * scaleX,
                         lineHeight: el.fontSize * 1.2
                     })
                 }
@@ -153,12 +240,55 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
                     {/* Tools */}
                     <button
                         onClick={addText}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 rounded hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors shadow-sm"
+                        className={`flex items-center gap-2 px-3 py-1.5 border rounded text-sm font-medium transition-colors shadow-sm ${activeTool === 'text' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}`}
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         Add Text
                     </button>
+                    <button
+                        onClick={() => setActiveTool('pen')}
+                        className={`flex items-center gap-2 px-3 py-1.5 border rounded text-sm font-medium transition-colors shadow-sm ${activeTool === 'pen' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                        title="Pen Tool"
+                    >
+                        <Pen className="w-4 h-4" />
+                    </button>
 
+                    {activeTool === 'pen' && (
+                        <div className="flex items-center gap-3 pl-2 border-l border-gray-200">
+                            {/* Color Choices */}
+                            <div className="flex items-center gap-1.5">
+                                {['#000000', '#ffffff', '#ff0000', '#0000ff', '#008000', '#ffa500'].map(color => (
+                                    <button
+                                        key={color}
+                                        onClick={() => setStrokeColor(color)}
+                                        className={`w-5 h-5 rounded-full border transition-transform hover:scale-110 ${strokeColor === color ? 'ring-2 ring-blue-400 ring-offset-1 scale-110' : 'border-gray-200'}`}
+                                        style={{ backgroundColor: color }}
+                                        title={color === '#ffffff' ? 'White / Eraser-like' : color}
+                                    />
+                                ))}
+                                <input
+                                    type="color"
+                                    value={strokeColor}
+                                    onChange={(e) => setStrokeColor(e.target.value)}
+                                    className="w-5 h-5 p-0 border-0 bg-transparent cursor-pointer"
+                                />
+                            </div>
+
+                            {/* Stroke Width */}
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs font-medium text-gray-500">Size</span>
+                                <input
+                                    type="range"
+                                    min="1"
+                                    max="20"
+                                    value={strokeWidth}
+                                    onChange={(e) => setStrokeWidth(parseInt(e.target.value))}
+                                    className="w-20 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                />
+                                <span className="text-xs min-w-[12px] text-gray-500">{strokeWidth}</span>
+                            </div>
+                        </div>
+                    )}
                     <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
                         <button
                             onClick={() => setScale(s => Math.max(0.5, s - 0.1))}
@@ -229,7 +359,40 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
                                 className="bg-white shadow-lg"
                                 renderTextLayer={false}
                                 renderAnnotationLayer={false}
+                                onLoadSuccess={onPageLoadSuccess}
                             >
+                                {/* Render saved paths */}
+                                <svg
+                                    className="absolute inset-0 pointer-events-none"
+                                    style={{ width: '100%', height: '100%' }}
+                                    viewBox={renderedPageSize[pageNumber] ? `0 0 ${renderedPageSize[pageNumber].width} ${renderedPageSize[pageNumber].height}` : undefined}
+                                >
+                                    {paths
+                                        .filter(p => p.page === pageNumber)
+                                        .map(p => (
+                                            <path
+                                                key={p.id}
+                                                d={p.d}
+                                                fill="none"
+                                                stroke={p.color}
+                                                strokeWidth={p.strokeWidth}
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        ))
+                                    }
+                                </svg>
+
+                                {/* Pen Tool Drawing Overlay */}
+                                <SimplePenTool
+                                    pageNumber={pageNumber}
+                                    scale={scale}
+                                    isActive={activeTool === 'pen'}
+                                    color={strokeColor}
+                                    strokeWidth={strokeWidth}
+                                    onPathComplete={handlePathComplete}
+                                />
+
                                 {textElements
                                     .filter(el => el.page === pageNumber)
                                     .map(el => (

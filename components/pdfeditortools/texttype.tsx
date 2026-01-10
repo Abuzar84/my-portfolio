@@ -13,7 +13,7 @@ interface TextTypeProps {
     onDelete: (id: number) => void;
 }
 
-export default function TextType({ id, initialText = "New Text", fontSize = 16, width = 200, height = 50, x, y, scale, onUpdate, onDelete }: TextTypeProps) {
+export default function TextType({ id, initialText = "New Text", fontSize = 16, width = 200, height = 18, x, y, scale, onUpdate, onDelete }: TextTypeProps) {
     const [text, setText] = useState(initialText);
     const [isDragging, setIsDragging] = useState(false);
     const [resizeMode, setResizeMode] = useState<'none' | 'text' | 'box'>('none');
@@ -125,13 +125,6 @@ export default function TextType({ id, initialText = "New Text", fontSize = 16, 
                 left: x * scale,
                 top: y * scale,
                 width: width * scale,
-                // Height is auto to grow with text, or could be fixed. 
-                // Using min-height based on font size or prop if easier.
-                // Let's rely on content or simple height prop if set.
-                // Actually to replicate Adobe/Word, we usually set width and let height grow?
-                // But user asked for adjustable... let's stick to Width resize for wrapping primarily as per "ENTER" functionality request.
-                // But let's allow height to grow automatically for now?
-                // Or better, let's wrap it properly.
                 transformOrigin: 'top left',
                 cursor: isDragging ? 'grabbing' : 'grab',
                 zIndex: 50,
