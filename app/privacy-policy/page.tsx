@@ -3,7 +3,8 @@
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnalyticsTracker } from '@/components/analytics-tracker';
 import Link from 'next/link';
-import { ArrowLeft, Shield, Eye, Database, Lock, Cookie } from 'lucide-react';
+import { ArrowLeft, Shield, Eye, Database, Lock, Cookie, ExternalLink, Megaphone } from 'lucide-react';
+
 
 export default function PrivacyPolicy() {
     const lastUpdated = new Date().toLocaleDateString('en-US', {
@@ -111,6 +112,40 @@ export default function PrivacyPolicy() {
                         <p>
                             <strong>Important:</strong> This ID is randomly generated. It does <strong>not</strong> contain your name, email, IP address, or any personal information. It is simply a random tag used to count unique visitors. You can clear this at any time by clearing your browser's cache/storage.
                         </p>
+                    </section>
+
+                    {/* Advertising & Monetization */}
+                    <section className="space-y-6">
+                        <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
+                            <Megaphone className="w-6 h-6" />
+                            <h2 className="text-2xl font-bold m-0">Advertising & Monetization</h2>
+                        </div>
+
+                        <p>
+                            To keep this portfolio and its tools (like the PDF Editor) free to use, I display advertisements provided by <strong>Monetag</strong>.
+                        </p>
+
+                        <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/20 rounded-2xl p-6">
+                            <p className="font-semibold mb-2">How Monetag Manages Data:</p>
+                            <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+                                <li><strong>Ad Delivery:</strong> Monetag uses your technical information (like device type, browser, and general location/IP) to deliver relevant ads.</li>
+                                <li><strong>Cookies:</strong> They may use cookies or similar technologies to prevent you from seeing the same ad repeatedly and to measure ad performance.</li>
+                                <li><strong>Anonymity:</strong> Monetag focuses on behavioral patterns and technical data rather than your personal identity.</li>
+                            </ul>
+                        </div>
+
+                        <p>
+                            You can learn more about how Monetag handles your data and your rights to opt-out by visiting their official documentation:
+                        </p>
+
+                        <a
+                            href="https://monetag.com/privacy/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+                        >
+                            Read Monetag's Privacy Policy <ExternalLink className="w-4 h-4" />
+                        </a>
                     </section>
 
                     {/* Data Storage */}
