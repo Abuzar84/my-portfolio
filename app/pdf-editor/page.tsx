@@ -1,5 +1,4 @@
 import { Metadata } from 'next'
-import Script from 'next/script'
 import PdfEditorClient from './PdfEditorClient'
 
 export const metadata: Metadata = {
@@ -16,11 +15,6 @@ export const metadata: Metadata = {
 export default function PdfEditorPage() {
     return (
         <>
-            <Script
-                src="https://3nbf4.com/act/files/tag.min.js?z=10435650"
-                data-cfasync="false"
-                strategy="beforeInteractive" // This ensures it stays in the head region effectively
-            />
             <PdfEditorClient />
         </>
     )

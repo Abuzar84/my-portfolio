@@ -22,9 +22,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
 @app.get("/api/python")
 async def root():
-    return {"message": "PDF Editor Python API is active on Vercel!"}
+    return {"message": "PDF Editor Python API is active!"}
 
 @app.post("/api/process-pdf")
 async def process_pdf(

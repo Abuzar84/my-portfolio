@@ -20,6 +20,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def root():
+    return {"message": "PDF Editor Python Backend is running!"}
+
 @app.post("/process-pdf")
 async def process_pdf(
     file: UploadFile = File(...),
