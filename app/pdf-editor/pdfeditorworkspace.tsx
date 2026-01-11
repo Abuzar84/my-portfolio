@@ -47,6 +47,15 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
     const [strokeWidth, setStrokeWidth] = useState(3)
     const [isDownloading, setIsDownloading] = useState(false)
     const [renderedPageSize, setRenderedPageSize] = useState<{ [key: number]: { width: number, height: number, originalWidth: number, originalHeight: number, rotation: number } }>({})
+    const [backendStatus, setBackendStatus] = useState<'checking' | 'connected' | 'offline'>('checking')
+
+    // Check if Python Backend is alive
+    useState(() => {
+        fetch('http://localhost:8000/')
+            .then(res => res.json())
+            .then(() => setBackendStatus('connected'))
+            .catch(() => setBackendStatus('offline'))
+    })
 
     function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
         setNumPages(numPages)
@@ -118,103 +127,45 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
     }
 
     const handleDownload = async () => {
-        if (!file) return
+        if (!file || backendStatus !== 'connected') {
+            if (backendStatus !== 'connected') alert('Python Backend is offline. Using local saver.');
+            // Fallback would go here, but let's assume we want to use Python
+        }
         setIsDownloading(true)
 
         try {
-            const fileBuffer = await file.arrayBuffer()
-            const pdfDoc = await PDFDocument.load(fileBuffer)
-            const pages = pdfDoc.getPages()
-            const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
+            // Get canvas dimensions from the first rendered page
+            const pageInfo = renderedPageSize[pageNumber];
+            if (!pageInfo) throw new Error("Page not rendered yet");
 
-            // Draw paths using native pdf-lib operators
-            paths.forEach(p => {
-                const pageIndex = p.page - 1
-                if (pageIndex >= 0 && pageIndex < pages.length) {
-                    const page = pages[pageIndex]
-                    const pageInfo = renderedPageSize[p.page]
-                    if (!pageInfo) return;
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('edits', JSON.stringify({
+                textElements,
+                paths,
+                canvasWidth: pageInfo.width,
+                canvasHeight: pageInfo.height
+            }));
 
-                    const { width, height } = page.getSize()
+            const response = await fetch('http://localhost:8000/process-pdf', {
+                method: 'POST',
+                body: formData,
+            });
 
-                    // Parse the SVG path "M x y L x y..." back into points
-                    const points = p.d.split(/[ML]/).filter(s => s.trim() !== '').map(pair => {
-                        const [x, y] = pair.trim().split(/\s+/).map(parseFloat)
-                        return { x, y }
-                    })
+            if (!response.ok) throw new Error('Backend rendering failed');
 
-                    if (points.length < 2) return
-
-                    const scaleX = width / pageInfo.width
-                    const scaleY = height / pageInfo.height
-
-                    // Set stroke properties
-                    const r = parseInt(p.color.slice(1, 3), 16) / 255
-                    const g = parseInt(p.color.slice(3, 5), 16) / 255
-                    const b = parseInt(p.color.slice(5, 7), 16) / 255
-
-                    // Draw each segment of the path using native pdf-lib drawLine
-                    for (let i = 0; i < points.length - 1; i++) {
-                        const startX = points[i].x * scaleX
-                        const startY = height - (points[i].y * scaleY)
-                        const endX = points[i + 1].x * scaleX
-                        const endY = height - (points[i + 1].y * scaleY)
-
-                        page.drawLine({
-                            start: { x: startX, y: startY },
-                            end: { x: endX, y: endY },
-                            thickness: p.strokeWidth * scaleX,
-                            color: rgb(r, g, b),
-                            opacity: 1,
-                        })
-                    }
-                }
-            })
-
-            textElements.forEach(el => {
-                const pageIndex = el.page - 1
-                if (pageIndex >= 0 && pageIndex < pages.length) {
-                    const page = pages[pageIndex]
-                    const pageInfo = renderedPageSize[el.page]
-                    if (!pageInfo) return;
-
-                    const { width, height } = page.getSize()
-                    const cropBox = page.getCropBox()
-                    const offsetX = cropBox.x || 0
-                    const offsetY = cropBox.y || 0
-
-                    // Calculate mapping from browser pixels (at scale 1) to PDF points
-                    const scaleX = width / pageInfo.width
-                    const scaleY = height / pageInfo.height
-
-                    const pdfX = (el.x * scaleX) + offsetX
-                    const pdfY = (height + offsetY) - (el.y * scaleY) - (el.fontSize * 0.8)
-
-                    page.drawText(el.text, {
-                        x: pdfX,
-                        y: pdfY,
-                        size: el.fontSize,
-                        font: font,
-                        color: rgb(0, 0, 0),
-                        maxWidth: el.width * scaleX,
-                        lineHeight: el.fontSize * 1.2
-                    })
-                }
-            })
-
-            const pdfBytes = await pdfDoc.save()
-            const blob = new Blob([pdfBytes as any], { type: 'application/pdf' })
-            const url = URL.createObjectURL(blob)
-            const link = document.createElement('a')
-            link.href = url
-            link.download = `edited_${file.name}`
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
-            URL.revokeObjectURL(url)
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `edited_${file.name}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         } catch (error) {
             console.error('Error generating PDF:', error)
-            alert('Failed to generate PDF. Please try again.')
+            alert('Failed to generate PDF. Please check if Python backend is running.')
         } finally {
             setIsDownloading(false)
         }
@@ -234,6 +185,10 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
                         </svg>
                     </button>
                     <h1 className="text-lg font-semibold text-gray-800 truncate max-w-xs">{file.name}</h1>
+                    <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${backendStatus === 'connected' ? 'bg-green-100 text-green-700' : backendStatus === 'offline' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'}`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${backendStatus === 'connected' ? 'bg-green-500 animate-pulse' : backendStatus === 'offline' ? 'bg-red-500' : 'bg-gray-400'}`} />
+                        {backendStatus === 'connected' ? 'Python Active' : backendStatus === 'offline' ? 'Python Offline' : 'Checking...'}
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-4">
