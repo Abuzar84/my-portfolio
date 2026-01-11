@@ -49,9 +49,12 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
     const [renderedPageSize, setRenderedPageSize] = useState<{ [key: number]: { width: number, height: number, originalWidth: number, originalHeight: number, rotation: number } }>({})
     const [backendStatus, setBackendStatus] = useState<'checking' | 'connected' | 'offline'>('checking')
 
+    const API_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:8000';
+
     // Check if Python Backend is alive
     useState(() => {
-        fetch('http://localhost:8000/')
+        const checkUrl = process.env.NODE_ENV === 'production' ? '/api/python' : `${API_URL}/`;
+        fetch(checkUrl)
             .then(res => res.json())
             .then(() => setBackendStatus('connected'))
             .catch(() => setBackendStatus('offline'))
@@ -147,7 +150,8 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
                 canvasHeight: pageInfo.height
             }));
 
-            const response = await fetch('http://localhost:8000/process-pdf', {
+            const endpoint = process.env.NODE_ENV === 'production' ? '/api/process-pdf' : `${API_URL}/process-pdf`;
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 body: formData,
             });
