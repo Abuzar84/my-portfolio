@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { Pen } from 'lucide-react'
+import { Pen, Undo, Redo } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf'
 import 'react-pdf/dist/Page/AnnotationLayer.css'
 import 'react-pdf/dist/Page/TextLayer.css'
 import TextType from '@/components/pdfeditortools/texttype'
 import SimplePenTool from '@/components/pdfeditortools/pentool'
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
+import { PDFDocument, rgb, StandardFonts, LineCapStyle } from 'pdf-lib'
 
 // Configure worker safely
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
@@ -48,6 +48,55 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
     const [isDownloading, setIsDownloading] = useState(false)
     const [renderedPageSize, setRenderedPageSize] = useState<{ [key: number]: { width: number, height: number, originalWidth: number, originalHeight: number, rotation: number } }>({})
 
+    // History State
+    const [history, setHistory] = useState<{ textElements: TextElement[], paths: DrawingPath[] }[]>([{ textElements: [], paths: [] }])
+    const [historyIndex, setHistoryIndex] = useState(0)
+
+    // Helper to add state to history
+    const addToHistory = (newTextElements: TextElement[], newPaths: DrawingPath[]) => {
+        const newHistory = history.slice(0, historyIndex + 1)
+        newHistory.push({ textElements: newTextElements, paths: newPaths })
+        setHistory(newHistory)
+        setHistoryIndex(newHistory.length - 1)
+        setTextElements(newTextElements)
+        setPaths(newPaths)
+    }
+
+    const undo = () => {
+        if (historyIndex > 0) {
+            const newIndex = historyIndex - 1
+            setHistoryIndex(newIndex)
+            setTextElements(history[newIndex].textElements)
+            setPaths(history[newIndex].paths)
+        }
+    }
+
+    const redo = () => {
+        if (historyIndex < history.length - 1) {
+            const newIndex = historyIndex + 1
+            setHistoryIndex(newIndex)
+            setTextElements(history[newIndex].textElements)
+            setPaths(history[newIndex].paths)
+        }
+    }
+
+    // Keyboard Shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+                e.preventDefault()
+                undo()
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+                e.preventDefault()
+                redo()
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [history, historyIndex])
+
     function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
         setNumPages(numPages)
     }
@@ -73,7 +122,7 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
     const addText = () => {
         setActiveTool('text')
         const newId = Math.max(0, ...textElements.map(e => e.id)) + 1
-        setTextElements([...textElements, {
+        const newTextElements = [...textElements, {
             id: newId,
             page: pageNumber,
             x: 50,
@@ -82,22 +131,24 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
             fontSize: 16,
             width: 200,
             height: 50
-        }])
+        }]
+        addToHistory(newTextElements, paths)
     }
 
     const handlePathComplete = (pathData: string) => {
         const newId = Math.max(0, ...paths.map(p => p.id)) + 1
-        setPaths([...paths, {
+        const newPaths = [...paths, {
             id: newId,
             page: pageNumber,
             d: pathData,
             color: strokeColor,
             strokeWidth: strokeWidth
-        }])
+        }]
+        addToHistory(textElements, newPaths)
     }
 
     const updateTextElement = (id: number, newText: string | null, newX: number | null, newY: number | null, newFontSize: number | null, newWidth: number | null, newHeight: number | null) => {
-        setTextElements(textElements.map(el => {
+        const newTextElements = textElements.map(el => {
             if (el.id === id) {
                 return {
                     ...el,
@@ -110,11 +161,13 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
                 }
             }
             return el
-        }))
+        })
+        addToHistory(newTextElements, paths)
     }
 
     const deleteTextElement = (id: number) => {
-        setTextElements(textElements.filter(el => el.id !== id))
+        const newTextElements = textElements.filter(el => el.id !== id)
+        addToHistory(newTextElements, paths)
     }
 
     const handleDownload = async () => {
@@ -166,6 +219,7 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
                             thickness: p.strokeWidth * scaleX,
                             color: rgb(r, g, b),
                             opacity: 1,
+                            lineCap: LineCapStyle.Round,
                         })
                     }
                 }
@@ -237,6 +291,26 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
                 </div>
 
                 <div className="flex items-center gap-4">
+                    {/* Undo/Redo */}
+                    <div className="flex items-center gap-1 border-r border-gray-200 pr-4 mr-2">
+                        <button
+                            onClick={undo}
+                            disabled={historyIndex === 0}
+                            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                            title="Undo (Ctrl+Z)"
+                        >
+                            <Undo className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={redo}
+                            disabled={historyIndex === history.length - 1}
+                            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                            title="Redo (Ctrl+Y)"
+                        >
+                            <Redo className="w-5 h-5" />
+                        </button>
+                    </div>
+
                     {/* Tools */}
                     <button
                         onClick={addText}
