@@ -8,6 +8,7 @@ import 'react-pdf/dist/Page/TextLayer.css'
 import TextType from '@/components/pdfeditortools/texttype'
 import SimplePenTool from '@/components/pdfeditortools/pentool'
 import { PDFDocument, rgb, StandardFonts, LineCapStyle } from 'pdf-lib'
+import { AnalyticsTracker } from '@/components/analytics-tracker'
 
 // Configure worker safely
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
@@ -47,6 +48,7 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
     const [strokeWidth, setStrokeWidth] = useState(3)
     const [isDownloading, setIsDownloading] = useState(false)
     const [renderedPageSize, setRenderedPageSize] = useState<{ [key: number]: { width: number, height: number, originalWidth: number, originalHeight: number, rotation: number } }>({})
+    const [selectedTextId, setSelectedTextId] = useState<number | null>(null)
 
     // History State
     const [history, setHistory] = useState<{ textElements: TextElement[], paths: DrawingPath[] }[]>([{ textElements: [], paths: [] }])
@@ -96,6 +98,39 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
         window.addEventListener('keydown', handleKeyDown)
         return () => window.removeEventListener('keydown', handleKeyDown)
     }, [history, historyIndex])
+
+    // Arrow Key Movement
+    useEffect(() => {
+        const handleArrowMove = (e: KeyboardEvent) => {
+            if (!selectedTextId) return
+
+            const isArrowKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)
+            if (!isArrowKey) return
+
+            // If user is typing in a textarea/input, don't move UNLESS they hold Shift or Ctrl
+            const isTyping = document.activeElement?.tagName === 'TEXTAREA' || document.activeElement?.tagName === 'INPUT'
+            if (isTyping && !e.shiftKey && !e.ctrlKey) return
+
+            e.preventDefault()
+
+            const step = e.shiftKey ? 10 : 1
+            let dx = 0, dy = 0
+            if (e.key === 'ArrowUp') dy = -step
+            if (e.key === 'ArrowDown') dy = step
+            if (e.key === 'ArrowLeft') dx = -step
+            if (e.key === 'ArrowRight') dx = step
+
+            setTextElements(prev => prev.map(el => {
+                if (el.id === selectedTextId) {
+                    return { ...el, x: el.x + dx, y: el.y + dy }
+                }
+                return el
+            }))
+        }
+
+        window.addEventListener('keydown', handleArrowMove)
+        return () => window.removeEventListener('keydown', handleArrowMove)
+    }, [selectedTextId])
 
     function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
         setNumPages(numPages)
@@ -280,6 +315,7 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
 
     return (
         <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
+            <AnalyticsTracker page={`/pdf-editor/workspace/view-page-${pageNumber}`} />
             {/* Toolbar */}
             <header className="flex flex-col bg-white border-b border-gray-200 shadow-sm z-20 w-full">
                 <div className="flex items-center justify-between px-4 md:px-6 py-2 md:py-3">
@@ -518,6 +554,8 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
                                             x={el.x}
                                             y={el.y}
                                             scale={scale}
+                                            isSelected={selectedTextId === el.id}
+                                            onSelect={() => setSelectedTextId(el.id)}
                                             onUpdate={updateTextElement}
                                             onDelete={deleteTextElement}
                                         />

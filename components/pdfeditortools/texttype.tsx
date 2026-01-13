@@ -10,11 +10,13 @@ interface TextTypeProps {
     x: number;
     y: number;
     scale: number;
+    isSelected?: boolean;
+    onSelect?: () => void;
     onUpdate: (id: number, newText: string | null, newX: number | null, newY: number | null, newFontSize: number | null, newWidth: number | null, newHeight: number | null) => void;
     onDelete: (id: number) => void;
 }
 
-export default function TextType({ id, initialText = "New Text", fontSize = 16, width = 200, height = 18, x, y, scale, onUpdate, onDelete }: TextTypeProps) {
+export default function TextType({ id, initialText = "New Text", fontSize = 16, width = 200, height = 18, x, y, scale, isSelected, onSelect, onUpdate, onDelete }: TextTypeProps) {
     const [text, setText] = useState(initialText);
     const [isDragging, setIsDragging] = useState(false);
     const [resizeMode, setResizeMode] = useState<'none' | 'text' | 'box'>('none');
@@ -154,11 +156,17 @@ export default function TextType({ id, initialText = "New Text", fontSize = 16, 
                 zIndex: 50,
                 touchAction: 'none'
             }}
-            onMouseDown={handleStart}
-            onTouchStart={handleStart}
-            className="group absolute"
+            onMouseDown={(e) => {
+                handleStart(e)
+                onSelect?.()
+            }}
+            onTouchStart={(e) => {
+                handleStart(e)
+                onSelect?.()
+            }}
+            className={`group absolute ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
         >
-            <div className="relative group-hover:ring-1 group-hover:ring-blue-300 rounded transition-shadow duration-200 h-full">
+            <div className={`relative ${isSelected ? '' : 'group-hover:ring-1 group-hover:ring-blue-300'} rounded transition-shadow duration-200 h-full`}>
                 {/* Drag Handle (Visible on hover or touch) */}
                 <div
                     className="drag-handle absolute -left-6 top-0 bottom-0 flex items-center justify-center cursor-move opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 rounded-l shadow-sm border border-r-0 border-blue-200"
@@ -169,6 +177,7 @@ export default function TextType({ id, initialText = "New Text", fontSize = 16, 
                 <textarea
                     value={text}
                     onChange={handleTextChange}
+                    onFocus={() => onSelect?.()}
                     className="bg-transparent border-none outline-none text-black font-sans w-full h-full p-0 m-0 resize-none overflow-hidden cursor-text"
                     style={{
                         fontSize: `${fontSize * scale}px`,

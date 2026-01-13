@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import Script from 'next/script'
 import PdfEditorClient from './PdfEditorClient'
+import { AnalyticsTracker } from '@/components/analytics-tracker'
 
 export const metadata: Metadata = {
     title: 'Free Online PDF Editor | Edit, Annotate & Save PDF',
@@ -21,6 +22,7 @@ export default function PdfEditorPage() {
                 data-cfasync="false"
                 strategy="beforeInteractive" // This ensures it stays in the head region effectively
             />
+            <AnalyticsTracker page="/pdf-editor" />
             <PdfEditorClient />
         </>
     )

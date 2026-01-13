@@ -5,25 +5,27 @@ This is the personal portfolio website for **Abuzar Wahadatullah Sayyed**, a Ful
 ## 🚀 Features
 
 -   **Modern Tech Stack**: Built with Next.js 15, React 19, and Tailwind CSS v4.
--   **Dark & Light Mode**: Fully themed environment with a toggle switch, respecting system preferences.
+-   **Light Theme Focus**: Optimized for a clean, professional light-mode aesthetic.
 -   **Responsive Design**: Optimized for all devices, from mobile phones to large desktops.
 -   **Premium Aesthetics**: Features smooth gradients, glassmorphism, and custom entry animations used throughout the site.
--   **SEO Optimized**: Proper metadata and structure for search engine visibility.
+-   **SEO Optimized**: Proper metadata and structure for search engine visibility, including dynamic sitemaps.
 -   **Admin Analytics Dashboard**: Track page views, visitor analytics, and referrer data with beautiful visualizations.
 -   **Supabase Authentication**: Secure email/password login for admin access.
 -   **PDF Editor**: Integrated PDF viewing and editing capabilities, allowing users to add text, resize elements, and download modified documents.
+-   **Premium Web Themes**: Showcasing professional-grade website templates like **The Aurelia (Hotel Theme)**.
 -   **Secure File Handling**: Client-side processing ensures PDF files are never uploaded to a server for privacy.
 
 ## 📸 Project Previews
 
 ![PDF Editor Preview](public/pdf-editor-preview.png)
+![Hotel Theme Preview](public/hotel-hero.png)
 
 ## 🛠️ Technologies Used
 
 -   **Framework**: [Next.js](https://nextjs.org/) (App Router)
 -   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 -   **Icons**: [Lucide React](https://lucide.dev/)
--   **Theming**: [next-themes](https://github.com/pacocoursey/next-themes)
+-   **Theming**: [next-themes](https://github.com/pacocoursey/next-themes) (Forced Light Mode)
 -   **Authentication**: [Supabase](https://supabase.com/)
 -   **PDF Processing**: [react-pdf](https://github.com/wojtekmaj/react-pdf)
 -   **Deployment**: Vercel (Recommended)
@@ -34,22 +36,23 @@ This is the personal portfolio website for **Abuzar Wahadatullah Sayyed**, a Ful
 ├── app/
 │   ├── admin/
 │   │   └── page.tsx         # Admin analytics dashboard with Supabase auth
+│   ├── Hoteltheme/
+│   │   └── page.tsx         # Premium Hotel Theme landing page
 │   ├── pdf-editor/
 │   │   └── page.tsx         # PDF editor page
 │   ├── privacy-policy/
 │   │   └── page.tsx         # Privacy policy page
 │   ├── globals.css          # Global styles, Tailwind setup, and custom animations
 │   ├── layout.tsx           # Root layout including ThemeProvider
-│   └── page.tsx             # Main landing page (Hero, Skills, Footer)
+│   └── page.tsx             # Main landing page (Hero, Skills, Projects, Themes)
 ├── components/
 │   ├── analytics-tracker.tsx  # Analytics tracking component
 │   ├── social-icons.tsx       # Social media icon components
-│   ├── theme-provider.tsx     # Context provider for light/dark mode
-│   └── theme-toggle.tsx       # Theme switcher component
+│   └── theme-provider.tsx     # Context provider for theming
 ├── lib/
-│   ├── analytics.ts           # Analytics utility functions
+│   ├── analytics-db.ts        # Analytics utility functions & Supabase integration
 │   └── supabase.ts            # Supabase client configuration
-└── public/                    # Static assets
+└── public/                    # Static assets (Images, Icons, etc.)
 ```
 
 ## 🔐 Admin Dashboard
@@ -63,7 +66,7 @@ This portfolio includes a powerful admin analytics dashboard:
   - Visitor analytics (device, location, referrer)
   - Time-based filtering (24h, 7d, 30d, all time)
   - Beautiful data visualizations
-  - Export and clear data options
+  - Secure admin access
 
 ### Setup Instructions
 
@@ -76,7 +79,7 @@ This portfolio includes a powerful admin analytics dashboard:
 1.  **Clone the repository:**
 
     ```bash
-    git clone https://github.com/yourusername/my-portfolio.git
+    git clone https://github.com/Abuzar84/my-portfolio.git
     cd my-portfolio
     ```
 
