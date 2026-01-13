@@ -393,7 +393,7 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
                     <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-t border-gray-200 overflow-x-auto no-scrollbar">
                         <div className="flex items-center gap-3">
                             <div className="flex items-center gap-1.5">
-                                {['#000000', '#ff0000', '#0000ff', '#008000', '#ffa500'].map(color => (
+                                {['#000000', '#ffffff', '#ff0000', '#0000ff', '#008000', '#ffa500'].map(color => (
                                     <button
                                         key={color}
                                         onClick={() => setStrokeColor(color)}
