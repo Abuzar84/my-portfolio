@@ -99,6 +99,10 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
 
     function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
         setNumPages(numPages)
+        // Set initial scale for mobile
+        if (window.innerWidth < 768) {
+            setScale(0.6)
+        }
     }
 
     const onPageLoadSuccess = (page: any) => {
@@ -277,142 +281,176 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
     return (
         <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
             {/* Toolbar */}
-            <header className="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 shadow-sm z-10 w-full">
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={onBack}
-                        className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded hover:bg-gray-100"
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                    </button>
-                    <h1 className="text-lg font-semibold text-gray-800 truncate max-w-xs">{file.name}</h1>
-                </div>
-
-                <div className="flex items-center gap-4">
-                    {/* Undo/Redo */}
-                    <div className="flex items-center gap-1 border-r border-gray-200 pr-4 mr-2">
+            <header className="flex flex-col bg-white border-b border-gray-200 shadow-sm z-20 w-full">
+                <div className="flex items-center justify-between px-4 md:px-6 py-2 md:py-3">
+                    <div className="flex items-center gap-2 md:gap-4">
                         <button
-                            onClick={undo}
-                            disabled={historyIndex === 0}
-                            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-                            title="Undo (Ctrl+Z)"
+                            onClick={onBack}
+                            className="text-gray-500 hover:text-gray-700 transition-colors p-1.5 rounded-lg hover:bg-gray-100"
                         >
-                            <Undo className="w-5 h-5" />
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
                         </button>
-                        <button
-                            onClick={redo}
-                            disabled={historyIndex === history.length - 1}
-                            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-                            title="Redo (Ctrl+Y)"
-                        >
-                            <Redo className="w-5 h-5" />
-                        </button>
+                        <h1 className="text-sm md:text-lg font-semibold text-gray-800 truncate max-w-[120px] md:max-w-xs">{file.name}</h1>
                     </div>
 
-                    {/* Tools */}
-                    <button
-                        onClick={addText}
-                        className={`flex items-center gap-2 px-3 py-1.5 border rounded text-sm font-medium transition-colors shadow-sm ${activeTool === 'text' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}`}
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                        Add Text
-                    </button>
-                    <button
-                        onClick={() => setActiveTool('pen')}
-                        className={`flex items-center gap-2 px-3 py-1.5 border rounded text-sm font-medium transition-colors shadow-sm ${activeTool === 'pen' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}`}
-                        title="Pen Tool"
-                    >
-                        <Pen className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-2 md:gap-4">
+                        {/* Undo/Redo - Hidden on very small screens, or grouped */}
+                        <div className="hidden sm:flex items-center gap-1 border-r border-gray-200 pr-2 md:pr-4 mr-1 md:mr-2">
+                            <button
+                                onClick={undo}
+                                disabled={historyIndex === 0}
+                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                                title="Undo (Ctrl+Z)"
+                            >
+                                <Undo className="w-4 h-4 md:w-5 md:h-5" />
+                            </button>
+                            <button
+                                onClick={redo}
+                                disabled={historyIndex === history.length - 1}
+                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                                title="Redo (Ctrl+Y)"
+                            >
+                                <Redo className="w-4 h-4 md:w-5 md:h-5" />
+                            </button>
+                        </div>
 
-                    {activeTool === 'pen' && (
-                        <div className="flex items-center gap-3 pl-2 border-l border-gray-200">
-                            {/* Color Choices */}
+                        {/* Tools */}
+                        <div className="flex items-center gap-1 md:gap-2">
+                            <button
+                                onClick={addText}
+                                className={`flex items-center justify-center gap-2 p-2 md:px-3 md:py-1.5 border rounded-lg text-sm font-medium transition-colors shadow-sm ${activeTool === 'text' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                                title="Add Text"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                <span className="hidden md:inline">Add Text</span>
+                            </button>
+                            <button
+                                onClick={() => setActiveTool('pen')}
+                                className={`flex items-center justify-center gap-2 p-2 md:px-3 md:py-1.5 border rounded-lg text-sm font-medium transition-colors shadow-sm ${activeTool === 'pen' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                                title="Pen Tool"
+                            >
+                                <Pen className="w-4 h-4" />
+                                <span className="hidden md:inline">Pen</span>
+                            </button>
+                        </div>
+
+                        {/* Zoom - Condence on mobile */}
+                        <div className="hidden md:flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                            <button
+                                onClick={() => setScale(s => Math.max(0.3, s - 0.1))}
+                                className="p-1 text-gray-600 hover:bg-white rounded-md shadow-sm transition-all"
+                                title="Zoom Out"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (window.innerWidth < 768) setScale(0.6);
+                                    else setScale(1.0);
+                                }}
+                                className="px-2 py-1 text-[10px] font-bold text-gray-500 hover:bg-white rounded transition-all"
+                            >
+                                FIT
+                            </button>
+                            <span className="text-xs font-medium w-9 text-center text-gray-600">{Math.round(scale * 100)}%</span>
+                            <button
+                                onClick={() => setScale(s => Math.min(3, s + 0.1))}
+                                className="p-1 text-gray-600 hover:bg-white rounded-md shadow-sm transition-all"
+                                title="Zoom In"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 md:gap-4">
+                        <button
+                            onClick={handleDownload}
+                            disabled={isDownloading}
+                            className="flex items-center gap-2 p-2 md:px-4 md:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Download PDF"
+                        >
+                            {isDownloading ? (
+                                <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            ) : (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            )}
+                            <span className="hidden sm:inline">{isDownloading ? 'Saving...' : 'Download'}</span>
+                        </button>
+                        <div className="hidden lg:block text-sm text-gray-500 border-l pl-4 border-gray-200">
+                            Page {pageNumber} of {numPages || '--'}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Sub-toolbar for Pen Settings on Mobile or active tool options */}
+                {activeTool === 'pen' && (
+                    <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-t border-gray-200 overflow-x-auto no-scrollbar">
+                        <div className="flex items-center gap-3">
                             <div className="flex items-center gap-1.5">
-                                {['#000000', '#ffffff', '#ff0000', '#0000ff', '#008000', '#ffa500'].map(color => (
+                                {['#000000', '#ff0000', '#0000ff', '#008000', '#ffa500'].map(color => (
                                     <button
                                         key={color}
                                         onClick={() => setStrokeColor(color)}
-                                        className={`w-5 h-5 rounded-full border transition-transform hover:scale-110 ${strokeColor === color ? 'ring-2 ring-blue-400 ring-offset-1 scale-110' : 'border-gray-200'}`}
+                                        className={`w-6 h-6 rounded-full border-2 transition-transform hover:scale-110 ${strokeColor === color ? 'border-blue-500 scale-110' : 'border-white shadow-sm'}`}
                                         style={{ backgroundColor: color }}
-                                        title={color === '#ffffff' ? 'White / Eraser-like' : color}
                                     />
                                 ))}
-                                <input
-                                    type="color"
-                                    value={strokeColor}
-                                    onChange={(e) => setStrokeColor(e.target.value)}
-                                    className="w-5 h-5 p-0 border-0 bg-transparent cursor-pointer"
-                                />
+                                <div className="relative w-6 h-6 overflow-hidden rounded-full border-2 border-white shadow-sm">
+                                    <input
+                                        type="color"
+                                        value={strokeColor}
+                                        onChange={(e) => setStrokeColor(e.target.value)}
+                                        className="absolute -inset-1 w-10 h-10 cursor-pointer p-0 border-none"
+                                    />
+                                </div>
                             </div>
 
-                            {/* Stroke Width */}
+                            <div className="h-4 w-[1px] bg-gray-300 mx-1" />
+
                             <div className="flex items-center gap-2">
-                                <span className="text-xs font-medium text-gray-500">Size</span>
+                                <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Size</span>
                                 <input
                                     type="range"
                                     min="1"
                                     max="20"
                                     value={strokeWidth}
                                     onChange={(e) => setStrokeWidth(parseInt(e.target.value))}
-                                    className="w-20 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                    className="w-20 md:w-32 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                                 />
-                                <span className="text-xs min-w-[12px] text-gray-500">{strokeWidth}</span>
+                                <span className="text-xs font-medium text-gray-600 w-4">{strokeWidth}</span>
                             </div>
                         </div>
-                    )}
-                    <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
-                        <button
-                            onClick={() => setScale(s => Math.max(0.5, s - 0.1))}
-                            className="p-1.5 text-gray-600 hover:bg-white rounded-md shadow-sm transition-all"
-                            title="Zoom Out"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>
-                        </button>
-                        <span className="text-sm font-medium w-12 text-center text-gray-600">{Math.round(scale * 100)}%</span>
-                        <button
-                            onClick={() => setScale(s => Math.min(3, s + 0.1))}
-                            className="p-1.5 text-gray-600 hover:bg-white rounded-md shadow-sm transition-all"
-                            title="Zoom In"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                        </button>
-                    </div>
-                </div>
 
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={handleDownload}
-                        disabled={isDownloading}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {isDownloading ? (
-                            <>
-                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Saving...
-                            </>
-                        ) : (
-                            <>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                Download
-                            </>
-                        )}
-                    </button>
-                    <div className="text-sm text-gray-500 border-l pl-4 border-gray-200">
-                        Page {pageNumber} of {numPages || '--'}
+                        {/* Mobile Zoom Controls in sub-toolbar */}
+                        <div className="flex md:hidden items-center gap-2 bg-white rounded-lg p-1 border border-gray-200 shadow-sm ml-4">
+                            <button
+                                onClick={() => setScale(s => Math.max(0.3, s - 0.1))}
+                                className="p-1 text-gray-600"
+                            >
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>
+                            </button>
+                            <span className="text-[10px] font-bold text-gray-500">{Math.round(scale * 100)}%</span>
+                            <button
+                                onClick={() => setScale(s => Math.min(3, s + 0.1))}
+                                className="p-1 text-gray-600"
+                            >
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                            </button>
+                        </div>
                     </div>
-                </div>
+                )}
             </header>
 
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden relative">
                 {/* PDF Container */}
-                <main className="flex-1 overflow-auto bg-gray-200 p-8 flex justify-center">
-                    <div className="shadow-2xl relative">
+                <main className="flex-1 overflow-auto bg-gray-200 p-2 md:p-8 flex justify-center">
+                    <div className="shadow-2xl relative mb-20 md:mb-0">
                         <Document
                             file={file}
                             onLoadSuccess={onDocumentLoadSuccess}
@@ -493,7 +531,7 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
 
             {/* Page Navigation - Bottom Floating or Sticky */}
             {numPages && numPages > 1 && (
-                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur shadow-lg rounded-full px-4 py-2 flex items-center gap-4 border border-gray-200 z-50">
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur shadow-xl rounded-full px-4 py-2 flex items-center gap-4 border border-gray-200 z-50">
                     <button
                         disabled={pageNumber <= 1}
                         onClick={() => setPageNumber(p => p - 1)}
@@ -501,7 +539,7 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                     </button>
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-xs md:text-sm font-medium text-gray-700 min-w-[40px] text-center">
                         {pageNumber} / {numPages}
                     </span>
                     <button
