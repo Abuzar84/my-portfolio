@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://abuzarsayyed.vercel.app'),
+  metadataBase: new URL('https://www.abuzarsayyed.in'),
   title: "Abuzar Wahadatullah Sayyed | Full Stack Developer & PDF Tools",
   description: "Explore the portfolio of Abuzar Wahadatullah Sayyed. Featuring full-stack web applications, native mobile apps, and high-performance PDF editing tools.",
   keywords: ["Full Stack Developer", "Next.js Portfolio", "Android Developer", "PDF Editor Online", "Abuzar Sayyed", "Software Engineer"],
