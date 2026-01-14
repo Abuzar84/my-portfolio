@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from 'next/script'
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 
 import { ThemeProvider } from "@/components/theme-provider";
@@ -60,9 +61,11 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
+        <SpeedInsights />
         <Script id="ad-tag">
           {`(function(s){s.dataset.zone = '10444650', s.src = 'https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
         </Script>
+
       </body>
     </html>
   );
