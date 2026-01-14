@@ -36,7 +36,7 @@ This is the personal portfolio website for **Abuzar Wahadatullah Sayyed**, a Ful
 ├── app/
 │   ├── admin/
 │   │   └── page.tsx         # Admin analytics dashboard with Supabase auth
-│   ├── Hoteltheme/
+│   ├── hoteltheme/
 │   │   └── page.tsx         # Premium Hotel Theme landing page
 │   ├── pdf-editor/
 │   │   └── page.tsx         # PDF editor page

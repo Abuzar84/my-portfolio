@@ -23,7 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
             priority: 0.3,
         },
         {
-            url: `${baseUrl}/Hoteltheme`,
+            url: `${baseUrl}/hoteltheme`,
             lastModified: new Date(),
             changeFrequency: 'monthly',
             priority: 0.7,
