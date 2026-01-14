@@ -65,7 +65,6 @@ export default function RootLayout({
         <Script id="ad-tag">
           {`(function(s){s.dataset.zone = '10444650', s.src = 'https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
         </Script>
-
       </body>
     </html>
   );
