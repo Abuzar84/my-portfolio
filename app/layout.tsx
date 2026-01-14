@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Abuzar Wahadatullah Sayyed Portfolio",
     description: "Full Stack Developer Portfolio & Free Online PDF Tools",
-    url: "https://abuzarsayyed.vercel.app",
+    url: "https://www.abuzarsayyed.in/",
     siteName: "Abuzar Sayyed Portfolio",
     images: [
       {

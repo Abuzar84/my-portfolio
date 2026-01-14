@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/',
             disallow: '/admin',
         },
-        sitemap: 'https://abuzarsayyed.vercel.app/sitemap.xml',
+        sitemap: 'https://www.abuzarsayyed.in/sitemap.xml',
     }
 }
