@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://www.abuzarsayyed.in' // Replace with your actual domain if different
+    const baseUrl = 'https://www.abuzarsayyed.in'
 
     return [
         {
@@ -23,7 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
             priority: 0.8,
         },
         {
-            url: `${baseUrl}/hoteltheme`,
+            url: `${baseUrl}/Hoteltheme`,
             lastModified: new Date(),
             changeFrequency: 'monthly',
             priority: 0.8,
