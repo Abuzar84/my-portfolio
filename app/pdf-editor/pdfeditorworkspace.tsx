@@ -247,10 +247,13 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
 
                     // Draw each segment of the path using native pdf-lib drawLine
                     for (let i = 0; i < points.length - 1; i++) {
-                        const startX = points[i].x * scaleX
-                        const startY = height - (points[i].y * scaleY)
-                        const endX = points[i + 1].x * scaleX
-                        const endY = height - (points[i + 1].y * scaleY)
+                        const cropBox = page.getCropBox();
+                        const offsetX = cropBox.x || 0;
+                        const offsetY = cropBox.y || 0;
+                        const startX = (points[i].x * scaleX) + offsetX
+                        const startY = height - (points[i].y * scaleY) + offsetY
+                        const endX = (points[i + 1].x * scaleX) + offsetX
+                        const endY = height - (points[i + 1].y * scaleY) + offsetY
 
                         page.drawLine({
                             start: { x: startX, y: startY },
@@ -328,12 +331,12 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
                         </button>
-                        <h1 className="text-sm md:text-lg font-semibold text-gray-800 truncate max-w-[120px] md:max-w-xs">{file.name}</h1>
+                        <h1 className="hidden md:block text text-lg font-semibold text-gray-800 truncate max-w-[120px] md:max-w-xs">{file.name}</h1>
                     </div>
 
                     <div className="flex items-center gap-2 md:gap-4">
                         {/* Undo/Redo - Hidden on very small screens, or grouped */}
-                        <div className="hidden sm:flex items-center gap-1 border-r border-gray-200 pr-2 md:pr-4 mr-1 md:mr-2">
+                        <div className="flex items-center gap-1 border-r border-gray-200 pr-2 md:pr-4 mr-1 md:mr-2">
                             <button
                                 onClick={undo}
                                 disabled={historyIndex === 0}
@@ -373,7 +376,7 @@ export default function PdfEditorWorkspace({ file, onBack }: PdfEditorWorkspaceP
                         </div>
 
                         {/* Zoom - Condence on mobile */}
-                        <div className="hidden md:flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
                             <button
                                 onClick={() => setScale(s => Math.max(0.3, s - 0.1))}
                                 className="p-1 text-gray-600 hover:bg-white rounded-md shadow-sm transition-all"
