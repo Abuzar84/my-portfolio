@@ -36,7 +36,7 @@ export default function Home() {
           </h1>
 
           <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-600 leading-relaxed">
-            Crafting seamless digital experiences with modern web technologies and native mobile applications.
+            Crafting seamless digital experiences with modern web technologies, native mobile applications, and Al.
           </p>
 
           <div className="flex justify-center gap-4 pt-4">
