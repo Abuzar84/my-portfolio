@@ -112,7 +112,7 @@ export default function Home() {
               <div className="p-6 space-y-4">
                 <h3 className="text-xl font-bold text-gray-900">PDF Editor</h3>
                 <p className="text-gray-600 text-sm leading-relaxed">
-                  A comprehensive tool for editing and managing PDF documents. Features include merging, splitting, and text manipulation.
+                  A comprehensive tool for editing and managing PDF documents. Features include add new text and draw on PDF.
                 </p>
                 <div className="flex flex-wrap gap-2 pt-2">
                   <span className="px-3 py-1 text-xs rounded-full bg-indigo-100 text-indigo-700">
