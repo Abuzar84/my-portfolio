@@ -32,11 +32,11 @@ export default function Home() {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-gray-900 via-gray-800 to-gray-400 pb-2">
-            Abuzar Wahadatullah Sayyed
+            Abuzar Wahdatullah Sayyed
           </h1>
 
           <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-600 leading-relaxed">
-            Crafting seamless digital experiences with modern web technologies, native mobile applications, and Al.
+            Crafting seamless digital experiences with modern web technologies, native mobile applications, and AI.
           </p>
 
           <div className="flex justify-center gap-4 pt-4">
