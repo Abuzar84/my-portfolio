@@ -184,9 +184,9 @@ export default function Home() {
       <footer id="contact" className="py-20 px-4 border-t border-black/5 bg-white transition-colors duration-300">
         <div className="max-w-4xl mx-auto text-center space-y-12">
           <div className="space-y-4">
-            <h2 className="text-3xl font-bold text-gray-900">Let's Collaborate</h2>
+            <h2 className="text-3xl font-bold text-gray-900">Let&apos;s Collaborate</h2>
             <p className="text-gray-600">
-              Have a project in mind? I'd love to hear about it.
+              Have a project in mind? I&apos;d love to hear about it.
             </p>
           </div>
 
