@@ -11,7 +11,6 @@ const styles = StyleSheet.create({
     header: {
         marginBottom: 20,
         borderBottomWidth: 2,
-        borderBottomColor: '#111',
         paddingBottom: 10,
     },
     name: {
@@ -20,7 +19,6 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 4,
-        color: '#111',
     },
     contactRow: {
         flexDirection: 'row',
@@ -36,9 +34,7 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         marginTop: 18,
         marginBottom: 8,
-        color: '#111',
         borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
         paddingBottom: 2,
         letterSpacing: 0.5,
     },
@@ -101,15 +97,18 @@ export interface ResumeData {
     education: EducationItem[];
     experience: ExperienceItem[];
     skills: string;
+    themeColor?: string;
 }
 
 export default function ResumePDF({ data }: { data: ResumeData }) {
+    const themeColor = data.themeColor || '#4f46e5'; // Default Indigo
+
     return (
         <Document>
             <Page size="A4" style={styles.page}>
                 {/* Header */}
-                <View style={styles.header}>
-                    <Text style={styles.name}>{data.name || 'YOUR NAME'}</Text>
+                <View style={[styles.header, { borderBottomColor: themeColor }]}>
+                    <Text style={[styles.name, { color: themeColor }]}>{data.name || 'YOUR NAME'}</Text><br />
                     <View style={styles.contactRow}>
                         {data.email ? <Text>{data.email}</Text> : null}
                         {data.phone ? <Text>• {data.phone}</Text> : null}
@@ -120,7 +119,7 @@ export default function ResumePDF({ data }: { data: ResumeData }) {
                 {/* Summary */}
                 {data.summary ? (
                     <View>
-                        <Text style={styles.sectionTitle}>Summary</Text>
+                        <Text style={[styles.sectionTitle, { color: themeColor, borderBottomColor: '#ddd' }]}>Summary</Text>
                         <Text style={styles.description}>{data.summary}</Text>
                     </View>
                 ) : null}
@@ -128,7 +127,7 @@ export default function ResumePDF({ data }: { data: ResumeData }) {
                 {/* Experience */}
                 {data.experience.length > 0 && (
                     <View>
-                        <Text style={styles.sectionTitle}>Experience</Text>
+                        <Text style={[styles.sectionTitle, { color: themeColor, borderBottomColor: '#ddd' }]}>Experience</Text>
                         {data.experience.map((exp, index) => (
                             <View key={index} style={styles.itemBlock}>
                                 <View style={styles.itemHeader}>
@@ -145,7 +144,7 @@ export default function ResumePDF({ data }: { data: ResumeData }) {
                 {/* Education */}
                 {data.education.length > 0 && (
                     <View>
-                        <Text style={styles.sectionTitle}>Education</Text>
+                        <Text style={[styles.sectionTitle, { color: themeColor, borderBottomColor: '#ddd' }]}>Education</Text>
                         {data.education.map((edu, index) => (
                             <View key={index} style={styles.itemBlock}>
                                 <View style={styles.itemHeader}>
@@ -162,7 +161,7 @@ export default function ResumePDF({ data }: { data: ResumeData }) {
                 {/* Skills */}
                 {data.skills ? (
                     <View>
-                        <Text style={styles.sectionTitle}>Skills</Text>
+                        <Text style={[styles.sectionTitle, { color: themeColor, borderBottomColor: '#ddd' }]}>Skills</Text>
                         <Text style={styles.skillText}>{data.skills}</Text>
                     </View>
                 ) : null}

@@ -99,7 +99,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="group relative rounded-2xl overflow-hidden border border-black/5 bg-gray-50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              < Link href="/pdf-editor" className="absolute inset-0 z-10">
+              <Link href="/pdf-editor" className="absolute inset-0 z-10">
                 <span className="sr-only">View PDF Editor Project</span>
               </Link>
               <div className="aspect-video bg-indigo-100 flex items-center justify-center overflow-hidden">
@@ -120,6 +120,34 @@ export default function Home() {
                   </span>
                   <span className="px-3 py-1 text-xs rounded-full bg-purple-100 text-purple-700">
                     TypeScript
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Resume Maker Project */}
+            <div className="group relative rounded-2xl overflow-hidden border border-black/5 bg-gray-50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <Link href="/resume-maker" className="absolute inset-0 z-10">
+                <span className="sr-only">View Resume Maker Project</span>
+              </Link>
+              <div className="aspect-video bg-white flex items-center justify-center overflow-hidden border-b border-black/5">
+                <img
+                  src="/resume-maker-preview.png"
+                  alt="Resume Maker Preview"
+                  className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+              <div className="p-6 space-y-4">
+                <h3 className="text-xl font-bold text-gray-900">Resume Maker</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  A professional resume builder with real-time PDF preview. Create ATS-friendly resumes with a modern split-screen interface.
+                </p>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <span className="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-700">
+                    React PDF
+                  </span>
+                  <span className="px-3 py-1 text-xs rounded-full bg-indigo-100 text-indigo-700">
+                    Next.js
                   </span>
                 </div>
               </div>

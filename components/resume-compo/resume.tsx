@@ -15,8 +15,11 @@ const PDFDownloadLink = dynamic(() => import('@react-pdf/renderer').then(mod => 
 });
 
 type TabId = 'personal' | 'experience' | 'education' | 'skills' | 'summary';
+type ResumeProps = {
+    themeColor: string;
+};
 
-export default function Resume() {
+export default function Resume({ themeColor }: ResumeProps) {
     const [activeTab, setActiveTab] = useState<TabId>('personal');
     const [formData, setFormData] = useState<ResumeData>({
         name: '',
@@ -27,6 +30,7 @@ export default function Resume() {
         education: [],
         experience: [],
         skills: '',
+        themeColor: themeColor,
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
