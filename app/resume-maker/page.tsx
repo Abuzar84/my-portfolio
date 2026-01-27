@@ -3,6 +3,7 @@ import Hero from "@/components/resume-compo/hero"
 import Resume from "@/components/resume-compo/resume"
 import { useState } from "react";
 import { Check, Palette, ArrowRight } from "lucide-react";
+import { AnalyticsTracker } from '@/components/analytics-tracker';
 
 type ResumeTheme = {
     id: string;
@@ -40,8 +41,8 @@ function ThemeSelection({ onSelect }: { onSelect: (color: string) => void }) {
                             key={theme.id}
                             onClick={() => setSelectedId(theme.id)}
                             className={`group relative p-6 bg-white rounded-2xl border-2 text-left transition-all duration-200 hover:shadow-lg ${selectedId === theme.id
-                                    ? 'border-indigo-600 ring-4 ring-indigo-50'
-                                    : 'border-transparent hover:border-gray-200 shadow-sm'
+                                ? 'border-indigo-600 ring-4 ring-indigo-50'
+                                : 'border-transparent hover:border-gray-200 shadow-sm'
                                 }`}
                         >
                             <div className="flex items-start justify-between mb-4">
@@ -87,6 +88,7 @@ export default function ResumeMaker() {
 
     return (
         <div>
+            <AnalyticsTracker page="/resume-maker" />
             {step === 'hero' && (
                 <Hero showButton={true} onClick={() => setStep('theme')} />
             )}

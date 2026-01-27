@@ -13,6 +13,7 @@ This is the personal portfolio website for **Abuzar Wahadatullah Sayyed**, a Ful
 -   **Supabase Authentication**: Secure email/password login for admin access.
 -   **PDF Editor**: Integrated PDF viewing and editing capabilities, allowing users to add text, resize elements, and download modified documents.
 -   **Premium Web Themes**: Showcasing professional-grade website templates like **The Aurelia (Hotel Theme)**.
+-   **Resume Maker**: A powerful, interactive resume builder with real-time PDF preview, customizable themes, and drag-and-drop experience.
 -   **Secure File Handling**: Client-side processing ensures PDF files are never uploaded to a server for privacy.
 
 ## 📸 Project Previews
@@ -28,6 +29,7 @@ This is the personal portfolio website for **Abuzar Wahadatullah Sayyed**, a Ful
 -   **Theming**: [next-themes](https://github.com/pacocoursey/next-themes) (Forced Light Mode)
 -   **Authentication**: [Supabase](https://supabase.com/)
 -   **PDF Processing**: [react-pdf](https://github.com/wojtekmaj/react-pdf)
+-   **PDF Generation**: [@react-pdf/renderer](https://react-pdf.org/)
 -   **Deployment**: Vercel (Recommended)
 
 ## 📂 Project Structure
@@ -42,6 +44,8 @@ This is the personal portfolio website for **Abuzar Wahadatullah Sayyed**, a Ful
 │   │   └── page.tsx         # PDF editor page
 │   ├── privacy-policy/
 │   │   └── page.tsx         # Privacy policy page
+│   ├── resume-maker/
+│   │   └── page.tsx         # Interactive Resume Builder
 │   ├── globals.css          # Global styles, Tailwind setup, and custom animations
 │   ├── layout.tsx           # Root layout including ThemeProvider
 │   └── page.tsx             # Main landing page (Hero, Skills, Projects, Themes)
