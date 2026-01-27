@@ -108,7 +108,7 @@ export default function ResumePDF({ data }: { data: ResumeData }) {
             <Page size="A4" style={styles.page}>
                 {/* Header */}
                 <View style={[styles.header, { borderBottomColor: themeColor }]}>
-                    <Text style={[styles.name, { color: themeColor }]}>{data.name || 'YOUR NAME'}</Text><br />
+                    <Text style={[styles.name, { color: themeColor }]}>{data.name || 'YOUR NAME'}</Text>
                     <View style={styles.contactRow}>
                         {data.email ? <Text>{data.email}</Text> : null}
                         {data.phone ? <Text>• {data.phone}</Text> : null}
